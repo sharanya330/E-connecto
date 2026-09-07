@@ -1,6 +1,6 @@
 
+> E-Connecto: Waste collection and recycling platform built with Next.js 16 and MongoDB.
 
-> Brief: Next.js web project — prepared for production deployment.
 
 ## Quick start (local)
 
