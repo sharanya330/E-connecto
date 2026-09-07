@@ -1,0 +1,95 @@
+const mongoose = require('mongoose');
+const bcrypt = require('bcryptjs');
+
+// MongoDB connection
+const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/e-connecto';
+
+// User Schema (simplified)
+const userSchema = new mongoose.Schema({
+    name: { type: String, required: true },
+    email: { type: String, required: true, unique: true },
+    password: { type: String },
+    googleId: { type: String },
+    role: { type: String, enum: ['user', 'recycler', 'admin'], default: 'user' },
+    ecoPoints: { type: Number, default: 0 },
+    businessName: { type: String },
+    contactPerson: { type: String },
+    phone: { type: String },
+    address: {
+        street: { type: String },
+        city: { type: String },
+        state: { type: String },
+        pinCode: { type: String },
+        latitude: { type: Number },
+        longitude: { type: Number }
+    },
+    ewasteTypes: [{ type: String }],
+    operatingHours: { type: String },
+    certifications: { type: String },
+    website: { type: String },
+    businessLicense: { type: String },
+    verificationStatus: {
+        type: String,
+        enum: ['pending', 'verified', 'rejected'],
+        default: 'pending'
+    },
+}, { timestamps: true });
+
+const User = mongoose.models.User || mongoose.model('User', userSchema);
+
+async function createAdmin() {
+    try {
+        // Connect to MongoDB
+        await mongoose.connect(MONGODB_URI);
+        console.log('✅ Connected to database');
+
+        // Check if admin already exists
+        const existingAdmin = await User.findOne({ email: 'srybroiambusy@gmail.com' });
+
+        if (existingAdmin) {
+            console.log('⚠️  Admin user already exists');
+            console.log('Email:', existingAdmin.email);
+            console.log('Role:', existingAdmin.role);
+
+            // Update to admin role if not already
+            if (existingAdmin.role !== 'admin') {
+                existingAdmin.role = 'admin';
+                await existingAdmin.save();
+                console.log('✅ Updated existing user to admin role');
+            }
+
+            await mongoose.connection.close();
+            process.exit(0);
+        }
+
+        // Hash the password
+        const hashedPassword = await bcrypt.hash('soulmad16092005', 10);
+
+        // Create admin user
+        const admin = await User.create({
+            name: 'Admin',
+            email: 'srybroiambusy@gmail.com',
+            password: hashedPassword,
+            role: 'admin',
+            ecoPoints: 0,
+            verificationStatus: 'verified'
+        });
+
+        console.log('✅ Admin user created successfully!');
+        console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+        console.log('📧 Email:', admin.email);
+        console.log('🔑 Password: soulmad16092005');
+        console.log('👤 Role:', admin.role);
+        console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+        console.log('\nYou can now login with these credentials!');
+
+        await mongoose.connection.close();
+        process.exit(0);
+    } catch (error) {
+        console.error('❌ Error creating admin:', error);
+        await mongoose.connection.close();
+        process.exit(1);
+    }
+}
+
+createAdmin();

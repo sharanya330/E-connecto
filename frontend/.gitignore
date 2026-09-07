@@ -1,0 +1,40 @@
+
+# Node / pnpm
+node_modules/
+.pnpm/
+.pnp.cjs
+.pnpm-store/
+
+# Next build outputs
+.next/
+out/
+dist/
+build/
+
+# env files
+.env
+.env.local
+.env.*.local
+.env.example
+
+
+# logs
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDEs
+.vscode/
+.idea/
+
+# misc
+coverage/
+coverage-final.json
+*.tgz
+.sass-cache
+.cache/
